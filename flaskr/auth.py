@@ -9,15 +9,17 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 
 from .models import User
+from .forms import LoginForm, RegistrationForm
 from .extensions import db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @bp.route("/register", methods=("GET", "POST"))
 def register():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
         error = None
 
         if not username:
@@ -38,13 +40,14 @@ def register():
         
         flash(error)
         
-    return render_template("auth/register.html")
+    return render_template("auth/register.html", form=form)
 
 @bp.route("/login", methods=("GET", "POST"))
 def login():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
         error = None
         user = User.query.filter_by(username=username).first()
 
@@ -60,7 +63,7 @@ def login():
         
         flash(error)
         
-    return render_template("auth/login.html")
+    return render_template("auth/login.html", form=form)
 
 @bp.before_app_request
 def load_logged_in_user():
