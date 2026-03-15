@@ -112,3 +112,10 @@ input[type=submit] {
   align-self: start;
   min-width: 10em;
 }
+
+.error {
+  color: #cc2f2e;
+  font-size: 0.85em;
+  margin-top: -0.75em;
+  margin-bottom: 1em;
+}
