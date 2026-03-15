@@ -1,9 +1,9 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, redirect, render_template, url_for
 )
 from werkzeug.exceptions import abort
+from flask_login import login_required, current_user
 
-from flaskr.auth import login_required
 from .extensions import db
 from .models import Post
 from .forms import PostForm
@@ -20,7 +20,7 @@ def index():
 def create():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, body=form.body.data, author=g.user)
+        post = Post(title=form.title.data, body=form.body.data, author=current_user)
         db.session.add(post)
         db.session.commit()
         return redirect(url_for("blog.index"))
@@ -33,7 +33,7 @@ def get_post(id, check_author=True):
     if post is None:
         abort(404, f"Post id {id} doesn't exist.")
     
-    if check_author and post.author_id != g.user.id:
+    if check_author and post.author_id != current_user.id:
         abort(403)
     
     return post

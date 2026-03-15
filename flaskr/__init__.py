@@ -1,5 +1,7 @@
 import os
 from flask import Flask
+from .extensions import db, login_manager
+from .models import User
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -15,7 +17,8 @@ def create_app(test_config=None):
     
     os.makedirs(app.instance_path, exist_ok=True)
 
-    from .extensions import db
+
+    login_manager.init_app(app)
     db.init_app(app)
 
     from . import models
