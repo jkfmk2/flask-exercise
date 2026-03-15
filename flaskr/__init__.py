@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from .extensions import db, login_manager
+from .extensions import db, login_manager, migrate
 from .models import User
 
 def create_app(test_config=None):
@@ -20,6 +20,7 @@ def create_app(test_config=None):
 
     login_manager.init_app(app)
     db.init_app(app)
+    migrate.init_app(app, db)
 
     from . import models
     from .commands import register_commands
