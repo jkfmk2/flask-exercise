@@ -31,4 +31,7 @@ def create_app(test_config=None):
     app.register_blueprint(auth.bp)
     app.register_blueprint(blog.bp)
 
+    from .admin import setup_admin
+    setup_admin(app)
+
     return app
