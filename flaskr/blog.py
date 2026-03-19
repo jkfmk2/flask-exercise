@@ -28,7 +28,7 @@ def create():
     return render_template("blog/create.html", form=form)
 
 def get_post(id, check_author=True):
-    post = Post.query.get(id)
+    post = db.session.get(Post, id)
 
     if post is None:
         abort(404, f"Post id {id} doesn't exist.")

@@ -1,4 +1,5 @@
 import pytest
+from flaskr.extensions import db
 from flaskr.models import Post
 
 def test_index(client, auth, post):
@@ -44,7 +45,7 @@ def test_update_post(app, client, auth, post):
     assert client.get('/1/update').status_code == 200 
     client.post('/1/update', data={'title': 'updated', 'body': 'new body'})
     with app.app_context():
-        post = Post.query.get(post.id)
+        post = db.session.get(Post, post.id)
         assert post.title == 'updated'
 
 def test_delete_post(auth, client, app, post):

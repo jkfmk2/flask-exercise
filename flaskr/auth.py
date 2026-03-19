@@ -4,8 +4,6 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 
-from werkzeug.security import check_password_hash, generate_password_hash
-
 from sqlalchemy.exc import IntegrityError
 from flask_login import login_user, logout_user
 
@@ -30,7 +28,8 @@ def register():
         
         if error is None:
             try:
-                user = User(username=username, password=generate_password_hash(password))   
+                user = User(username=username)   
+                user.password = password
                 db.session.add(user)
                 db.session.commit()
             except IntegrityError:
@@ -54,7 +53,7 @@ def login():
 
         if user is None:
             error = "Incorrect username."
-        elif not check_password_hash(user.password, password):
+        elif not user.check_password(password):
             error = "Incorrect password."
         
         if error is None:
