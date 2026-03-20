@@ -1,61 +1,74 @@
 # Flask Blog Exercise
 
-This project is a Flask-based blog application, following the standard Flask tutorial architecture. It provides a foundational implementation of a web application with user authentication and blog post management.
+This project is an enhanced Flask-based blog application, evolving from the standard Flask tutorial into a modern implementation using SQLAlchemy and popular extensions.
 
 ## Project Overview
 
 - **Main Technology:** [Flask](https://flask.palletsprojects.com/) (Python)
-- **Database:** SQLite
+- **Database:** SQLite with [SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/)
+- **Authentication:** [Flask-Login](https://flask-login.readthedocs.io/) and [Flask-Bcrypt](https://flask-bcrypt.readthedocs.io/)
+- **Forms:** [Flask-WTF](https://flask-wtf.readthedocs.io/)
+- **Admin Interface:** [Flask-Admin](https://flask-admin.readthedocs.io/)
+- **Migrations:** [Flask-Migrate](https://flask-migrate.readthedocs.io/)
 - **Architecture:** 
-    - **Application Factory Pattern:** The app is initialized in `flaskr/__init__.py`.
-    - **Blueprints:** Modularized logic for authentication (`flaskr/auth.py`) and blog functionality (`flaskr/blog.py`).
-    - **Database Management:** Handled in `flaskr/db.py` with schema defined in `flaskr/schema.sql`.
-    - **Templates:** Uses Jinja2 for rendering HTML, located in `flaskr/templates`.
-    - **Static Assets:** CSS and other assets are in `flaskr/static`.
+    - **Application Factory Pattern:** App initialization in `flaskr/__init__.py`.
+    - **Blueprints:** Modular logic for `auth` and `blog`.
+    - **Models:** Declarative models in `flaskr/models.py`.
+    - **Extensions:** Centralized extension management in `flaskr/extensions.py`.
+    - **Forms:** Class-based form definitions in `flaskr/forms.py`.
 
 ## Building and Running
 
 ### 1. Prerequisites
-Ensure you have Python installed. It is recommended to use a virtual environment.
+Ensure you have Python installed. Use a virtual environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+```
 
 ### 2. Install Dependencies
-While a `requirements.txt` is not present, the core dependencies are:
-- `flask`
-- `werkzeug`
-
 ```bash
-pip install flask
+pip install flask flask-sqlalchemy flask-login flask-bcrypt flask-wtf flask-migrate flask-admin email-validator
 ```
 
 ### 3. Initialize the Database
-Before running the app for the first time, or to reset it, run:
+You can initialize the database using the custom command:
 ```bash
 flask --app flaskr init-db
 ```
+Or use Flask-Migrate for version control:
+```bash
+flask --app flaskr db upgrade
+```
 
-### 4. Run the Application
-Start the development server:
+### 4. Create an Admin User
+To access the admin interface (`/admin`), create a user with admin privileges:
+```bash
+flask --app flaskr create-admin
+```
+
+### 5. Run the Application
 ```bash
 flask --app flaskr run --debug
 ```
 The application will be available at `http://127.0.0.1:5000`.
 
-### 5. Production Entry Point
-`wsgi.py` is provided as an entry point for WSGI servers (like Gunicorn or uWSGI).
-
 ## Development Conventions
 
-- **Factory Pattern:** Always use `flaskr.create_app()` to instantiate the application.
-- **Instance Folder:** Local configuration (like the SQLite DB) is stored in the `instance/` directory, which is excluded from version control.
-- **Authentication:** Use the `@login_required` decorator from `flaskr.auth` to protect views.
-- **Database Access:** Use `flaskr.db.get_db()` within an application context to get a database connection.
-- **URL Rules:** The `blog.index` endpoint is mapped to the root URL (`/`).
+- **Models:** Define all database schemas in `flaskr/models.py`.
+- **Forms:** Use `flaskr/forms.py` for all input validation.
+- **Security:** 
+    - Use `current_user` from Flask-Login for session management.
+    - Use `@login_required` to protect views.
+    - Password hashing is handled automatically by the `User.password` setter using Bcrypt.
+- **Admin:** New models should be registered in `flaskr/admin.py`.
 
 ## Key Files
 
-- `flaskr/__init__.py`: App factory and blueprint registration.
-- `flaskr/auth.py`: User registration, login, and session management.
-- `flaskr/blog.py`: CRUD operations for blog posts.
-- `flaskr/db.py`: SQLite connection and CLI command definitions.
-- `flaskr/schema.sql`: SQL definitions for `user` and `post` tables.
-- `wsgi.py`: WSGI entry point.
+- `flaskr/extensions.py`: Initialization of SQLAlchemy, LoginManager, etc.
+- `flaskr/models.py`: Database models (User, Post).
+- `flaskr/auth.py`: Authentication views.
+- `flaskr/blog.py`: Blog CRUD views.
+- `flaskr/forms.py`: WTForms definitions.
+- `flaskr/admin.py`: Flask-Admin configuration.
+- `flaskr/commands.py`: Custom CLI commands.

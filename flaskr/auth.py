@@ -19,26 +19,16 @@ def register():
     if form.validate_on_submit():
         username = form.username.data
         password = form.password.data
-        error = None
-
-        if not username:
-            error = "Username is required."
-        elif not password:
-            error = "Password is required."
         
-        if error is None:
-            try:
-                user = User(username=username)   
-                user.password = password
-                db.session.add(user)
-                db.session.commit()
-            except IntegrityError:
-                db.session.rollback()
-                error = f"User {username} is already registered."
-            else:
-                return redirect(url_for("auth.login"))
-        
-        flash(error)
+        try:
+            user = User(username=username)   
+            user.password = password
+            db.session.add(user)
+            db.session.commit()
+            return redirect(url_for("auth.login"))
+        except IntegrityError:
+            db.session.rollback()
+            flash(f"User {username} is already registered.")
         
     return render_template("auth/register.html", form=form)
 

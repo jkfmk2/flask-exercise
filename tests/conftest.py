@@ -3,7 +3,6 @@ import pytest
 from flaskr import create_app
 from flaskr.extensions import db
 from flaskr.models import User
-from werkzeug.security import check_password_hash, generate_password_hash
 
 @pytest.fixture
 def app():
@@ -29,14 +28,16 @@ def session(app):
 
 @pytest.fixture
 def user(session):
-    user = User(username='tester', password=generate_password_hash('#1234Abc'))
+    user = User(username='tester')
+    user.password = '#1234Abc'
     session.add(user)
     session.commit()
     return user
 
 @pytest.fixture
 def other_user(session):
-    user = User(username='others', password=generate_password_hash('#1234Abc'))
+    user = User(username='others')
+    user.password = '#1234Abc'
     session.add(user)
     session.commit()
     return user
@@ -54,7 +55,7 @@ def post(session, user):
     return post
 
 class AuthActions(object):
-    def __init__(self, client, user, other_user):
+    def __init__(self, client):
         self._client = client
 
     def register(self, username='tester123', password='#1234Abc', confirm_password='#1234Abc'):
@@ -78,4 +79,4 @@ class AuthActions(object):
     
 @pytest.fixture
 def auth(client, user, other_user):
-    return AuthActions(client, user, other_user)
+    return AuthActions(client)
